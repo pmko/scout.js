@@ -23,9 +23,9 @@ Micro JavaScript library that has only what you need and nothing you don't.  Des
 * Safari 5.1+ [osx/win]
 
 ## Contributors
-https://github.com/pmko
-https://github.com/bretternst
-https://github.com/mattlowery
+https://github.com/pmko  
+https://github.com/bretternst  
+https://github.com/mattlowery  
 https://github.com/yueguhu
 
 ## License

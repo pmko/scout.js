@@ -1,4 +1,5 @@
-Micro JavaScript library that has only what you need and nothing you don't.  Designed for efficiency and a familiar jQuery like syntax.  Plays well with other libraries, has a unique blend of functionality and doesn't leave out Internet Explorer (yeah, scout was created when IE was a thing).
+Micro JavaScript library that has only what you need and nothing you don't.  Designed for efficiency and a familiar jQuery like syntax.  Plays well with other libraries, has a unique blend of functionality and doesn't leave out Internet Explorer  
+(yeah, scout was created when IE was a thing).
 
 ## core
 * minimal API, only what you need

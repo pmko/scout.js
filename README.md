@@ -1,6 +1,17 @@
 Micro JavaScript library that has only what you need and nothing you don't.  Designed for efficiency and a familiar jQuery like syntax.  Plays well with other libraries, has a unique blend of functionality and doesn't leave out Internet Explorer  
 (yeah, scout was created when IE was a thing).
 
+## build
+To do a default build which includes the scout, ajax, and events modules just run:
+~~~ sh
+$ node make dist
+~~~
+
+If you want to compile additional modules into the build then use the following:
+~~~ sh
+$ MODULES="module1 module2 module3 module4" node make dist
+~~~
+
 ## core
 * minimal API, only what you need
 * DOM

@@ -15,7 +15,7 @@
             w = window,
             i = 0;
 
-        /** 
+        /**
          * Core Scout object. Attempts to subclass Array.
          * Derived from: http://perfectionkills.com/how-ecmascript-5-still-does-not-allow-to-subclass-an-array/
          *
@@ -38,7 +38,7 @@
          * Primary selector interface.
          *
          * @method $
-         * @param {String, Function, Array} selector 
+         * @param {String, Function, Array} selector
          *      String: Specifies the DOM selector to execute.
          *      Function: Specifies a callback to be executed on DOM ready.
          *      Array: Specifies an array of string selectors to execute.
@@ -528,11 +528,11 @@
                 return this.length;
             },
             scrollLeft: function(value) {
-                if(typeof value === u) return this[0].scrollLeft; 
+                if(typeof value === u) return this[0].scrollLeft;
                 this[0].scrollLeft = value;
             },
             scrollTop: function(value) {
-               if(typeof value === u) return this[0].scrollTop; 
+               if(typeof value === u) return this[0].scrollTop;
                this[0].scrollTop = value;
             },
             shift: function() {
@@ -621,7 +621,7 @@
                 }
                 return this;
             },
-            /** 
+            /**
              * Gets or sets a DOM element's property.
              *
              * @method $.prop
@@ -685,7 +685,7 @@
                 }
                 return this;
             },
-            /** 
+            /**
              * Appends the provided HTML to a DOM element.
              *
              * @method $.append
@@ -746,7 +746,7 @@
                 return this;
             },
             /**
-             * Creates a DOM element containing the provided HTML before 
+             * Creates a DOM element containing the provided HTML before
              * another DOM element.
              *
              * @method $.before
@@ -764,7 +764,7 @@
                 }
                 return this;
             },
-            /** 
+            /**
              * Creates a DOM element containing the provided HTML after
              * another DOM element.
              *
@@ -820,7 +820,7 @@
                 if (this.length == 0) return undefined;
                 return $(this[0].parentNode);
             },
-            /** 
+            /**
              * Gets the child elements of a DOM element.
              *
              * @method $.children
@@ -886,7 +886,7 @@
             },
             /**
              * Removes a DOM element.
-             * 
+             *
              * @method $.remove
              */
             remove: function() {
@@ -1032,7 +1032,7 @@
 
                 return this[0].offsetHeight || this[0].height;
             },
-            /** 
+            /**
              * Gets the width of a DOM element.
              *
              * @method $.width
@@ -1064,8 +1064,9 @@
     '$' in exports || (exports.$ = s);
 
 })(window);
+
 //     ajax.js
-//     (c) 2013 Chris Colinsky https://github.com/dev-scouts-of-america/scout.js
+//     (c) 2015 Chris Colinsky https://github.com/pmko/scout.js
 //     Licensed under the terms of the MIT license.
 
 (function(exports) {
@@ -1162,406 +1163,12 @@
             return deferred.promise(xhr);
         }
     }
-	
+
     extend(exports.Scout);
 })(window);
-(function($){
-    // helper: invoke a series of callbacks with a scope and args, and clear
-    // the queue.
-    function invoke(scope, args, arr) {
-        if(arr instanceof Array) {
-            arr.forEach(function(c) { c.apply(scope, args); });
-            arr.length = 0;
-        }
-    }
 
-    /**
-     * Tracks an asynchronous operation and provides notification for success,
-     * failure, and progress updates. Deferred objects may be chained together
-     * and multiple simultaneous operations may be tracked using $.when().
-     *
-     * @class $.Deferred
-     * @constructor
-     * @param {Function} [beforeStart] a callback invoked before the constructor completes
-     * @for Scout
-     */
-    $.Deferred = function(beforeStart) {
-        // new operator optional
-        if(!(this instanceof $.Deferred)) {
-            return new $.Deferred();
-        }
-        
-        // 0 = pending
-        // 1 = resolved
-        // 2 = rejected
-        this._state = 0;
-        var d = this;
-
-        /**
-         * An immutable interface for the deferred class, typically returned by
-         * functions that start async operations.
-         *
-         * @class Promise
-         * @for $.Deferred
-         */
-        d._promise = {
-            _promise: true,
-
-            /**
-             * Add one or more callback functions to be invoked when the operation
-             * either succeeds or fails. Zero or more arguments may be provided
-             * depending on the operation.
-             *
-             * @method always
-             * @param {Function} args* one or more callbacks
-             * @return {Object} [args] returns this
-             * @for Promise
-             */
-            always: function() {
-                this.done(arguments);
-                this.fail(arguments);
-                return this;
-            },
-            /**
-             * Add one or more callback functions to be invoked when the operation
-             * succeeds. Zero or more arguments may be provided depending on the
-             * operation.
-             *
-             * @method done
-             * @param {Function} args* one or more callbacks
-             * @return {Object} returns this
-             * @for Promise
-             */
-            done: function() {
-                d._done = flatten(d._done, arguments);
-                if(d._state === 1) {
-                    invoke(d._scope || d, d._args, d._done);
-                }
-                return this;
-            },
-            /**
-             * Add one or more callback functions to be invoked when the operation
-             * fails. Zero or more arguments may be provided depending on the
-             * operation.
-             *
-             * @method fail
-             * @param {Function} args* one or more callbacks
-             * @return {Object} returns this
-             * @for Promise
-             */
-            fail: function() {
-                d._fail = flatten(d._fail, arguments);
-                if(d._state === 2) {
-                    invoke(d._scope || d, d._args, d._fail);
-                }
-                return this;
-            },
-            /**
-             * Add one or more callback functions to be invoked when the operation
-             * makes progress. Zero or more arguments may be provided depending on the
-             * operation.
-             *
-             * @method progress
-             * @param {Function} args* one or more callbacks
-             * @return {Object} returns this
-             * @for Promise
-             */
-            progress: function() {
-                d._progress = flatten(d._progress, arguments);
-                return this;
-            },
-            /**
-             * Indicates whether the operation has failed.
-             * 
-             * @method isRejected
-             * @return {Boolean} returns true if the operation failed
-             * @for Promise
-             */
-            isRejected: function() { return d._state === 2; },
-            /**
-             * Indicates whether the oepration has succeeded.
-             *
-             * @method isResolved
-             * @return {Boolean} returns true if the operation succeeded
-             * @for Promise
-             */
-            isResolved: function() { return d._state === 1; },
-            /**
-             * Gets the current state of the operation. Possible values are
-             * "pending", "resolved", or "rejected".
-             *
-             * @method state
-             * @return {String} returns the current state of the operation
-             * @for Promise
-             */
-            state: function() {
-                switch(d._state) {
-                    case 0: return "pending";
-                    case 1: return "resolved";
-                    case 2: return "rejected";
-                }
-            },
-            /**
-             * Returns a new promise that applies the provided filter functions
-             * to the output arguments supplied by this promise.
-             *
-             * @method then
-             * @param {Function} doneFilter the done filter callback
-             * @param {Function} [failFilter] the fail filter callback
-             * @param {Function} [progressFilter] the progress filter callback
-             * @returns {Object} a new promise that will complete when this one does
-             * @for Promise
-             */
-            then: function(doneFilter, failFilter, progressFilter) {
-                var next = new $.Deferred();
-                this.done(bindFilter(next.resolve.bind(next), doneFilter, d));
-                this.fail(bindFilter(next.reject.bind(next), failFilter, d));
-                this.progress(bindFilter(next.notify.bind(next), progressFilter, d));
-                return next.promise();
-            },
-            promise: function() { return this; }
-        };
-        this._promise.prototype = {
-            constructor: $.Deferred
-        };
-
-        if(typeof beforeStart === "function") {
-            beforeStart.call(this, this);
-        }
-
-        // helper: callbacks could be passed in as functions or arrays of functions,
-        // so flatten them out
-        function flatten(arr, args) {
-            arr = arr || [];
-            // may not be an array
-            for(var i = 0; i < args.length; i++) {
-                var c = args[i];
-                if(typeof c === "function")
-                    arr.push(c);
-                else if (c instanceof Array || typeof c === "object" && typeof c.length === "number") { 
-                    flatten(arr, c);
-                }
-            }
-            return arr;
-        }
-
-        // helper: apply an optional filter function when chaining two deferred objects.
-        function bindFilter(next, filter, scope) {
-            if(typeof filter === "function") {
-                return function() {
-                    var args = Array.prototype.slice.call(arguments);
-                    var newArg = filter.apply(scope, arguments);
-                    args = newArg !== null && typeof newArg !== "undefined" ? [newArg] : args;
-                    next.apply(null, args);
-                }
-            } else {
-                return next;
-            }
-        }
-    }
-
-    $.Deferred.prototype = {
-        /**
-         * To be called when the asynchronous operation has succeeded. The done
-         * callbacks will be executed with the supplied arguments.
-         *
-         * @param {Object} [args]* callback arguments
-         * @method resolve
-         * @for $.Deferred
-         */
-        resolve: function() {
-            if(this._state > 0) return;
-            this._state = 1;
-            this._args = Array.prototype.slice.call(arguments);
-            this._args.push(this._promise);
-            invoke(this._scope || this._promise, this._args, this._done);
-        },
-        /**
-         * To be called when the asynchronous operation succeeds, providing a
-         * scope. The 'this' value of the callbacks will be set to the first
-         * argument, and all additional parameters will be passed.
-         *
-         * @param {Object} scope callback scope
-         * @param {Object} [args]* callback arguments
-         * @method resolveWith
-         * @for $.Deferred
-         */
-        resolveWith: function(scope) {
-            if(this._state > 0) return;
-            this._scope = scope;
-            this.resolve.apply(this, Array.prototype.slice.call(arguments, 1));
-        },
-        /**
-         * To be called when the asynchronous operation has failed. The fail
-         * callbacks will be executed with the supplied arguments.
-         *
-         * @param {Object} [args]* callback arguments
-         * @method reject
-         * @for $.Deferred
-         */
-        reject: function() {
-            if(this._state > 0) return;
-            this._state = 2;
-            this._args = Array.prototype.slice.call(arguments);
-            this._args.push(this._promise);
-            invoke(this._scope || this._promise, this._args, this._fail);
-        },
-        /**
-         * To be called when the asynchronous operation fails, providing a
-         * scope. The 'this' value of the callbacks will be set to the first
-         * argument, and all additional parameters will be passed.
-         *
-         * @param {Object} scope callback scope
-         * @param {Object} [args]* callback arguments
-         * @method rejectWith
-         * @for $.Deferred
-         */
-        rejectWith: function(scope) {
-            if(this._state > 0) return;
-            this._scope = scope;
-            this.reject.apply(this, Array.prototype.slice.call(arguments, 1));
-        },
-        /**
-         * To be called when the asynchronous operation has made progress. The progress
-         * callbacks will be executed with the supplied arguments.
-         *
-         * @param {Object} [args]* callback arguments
-         * @method notify
-         * @for $.Deferred
-         */
-        notify: function() {
-            var args = Array.prototype.slice.call(arguments);
-            args.push(this._promise);
-            invoke(this._promise, args, this._progress);
-        },
-        /**
-         * To be called when the asynchronous operation makes progress, providing a
-         * scope. The 'this' value of the callbacks will be set to the first
-         * argument, and all additional parameters will be passed.
-         *
-         * @param {Object} scope callback scope
-         * @param {Object} [args]* callback arguments
-         * @method notifyWith
-         * @for $.Deferred
-         */
-        notifyWith: function(scope) {
-            var args = Array.prototype.slice.call(arguments, 1);
-            args.push(this._promise);
-            invoke(scope, args, this._progress);
-        },
-        /**
-         * Returns a promise, which is an immutable version of the deferred object.
-         * This is normally called by API implementors when beginning an async
-         * operation so that the consumer can attach callbacks and check progress.
-         *
-         * @method promise
-         * @returns {Object} a promise, or immutable version of the deferred object.
-         * @for $.Deferred
-         */
-        promise: function(obj) {
-            if(typeof obj === "object") {
-                return this._promise = $.extend(obj, this._promise);
-            }
-            return this._promise;
-        }
-    };
-
-    /**
-     * Combines one or more deferred objects or promises into a single promise which
-     * will call its done callbacks when all operatinos have succeeded or its fail
-     * callbacks when any operation fails.
-     *
-     * When supplying multiple promises, the arguments for each operation will be
-     * supplied as arrays to the callbacks in the same order that the operations were
-     * provided to this function.
-     *
-     * @method $.when
-     * @param {Object} args* one or more promise or deferred objects
-     * @returns {Object} a new aggregate promise
-     * @for Scout
-     */
-    $.when = function() {
-        if(arguments.length < 2) {
-            // a single deferred/promise merely returns the same promise
-            var arg = arguments[0];
-            if(typeof arg.promise === "function") {
-                return arg.promise();
-            }
-            else {
-                // any other kind of object (or nothing) returns a resolved 
-                // deferred with the original argument.
-                var result = new $.Deferred();
-                result.resolve(arg);
-                return result.promise();
-            }
-        }
-
-        // multiple deferreds - track them all
-        var master = new $.Deferred(),
-            count = 0,
-            args = [[]];
-        var fail = master.reject.bind(master);
-        for(var i = 0; i < arguments.length; i++) {
-            var d = arguments[i];
-            if(typeof d.promise === "function") {
-                d = d.promise();
-                args[0][i] = d;
-                count++;
-                (function(idx) {
-                    d.done(function() {
-                        // collect all done arguments
-                        args[idx + 1] = Array.prototype.slice.apply(arguments);
-                        if(!--count) {
-                            master.resolveWith.apply(master, args);
-                        }
-                    });
-                })(i);
-                // a single failure stops the whole show
-                d.fail(fail);
-            }
-        }
-        return master.promise();
-    };
-
-    /**
-     * Returns a promise that completes when all promises attached to the elements
-     * in the collection are complete. An optional category name can be used to
-     * filter promises. For example, passing "fx" will filter for animation promises.
-     *
-     * @method .promise
-     * @param {Object} [category] an optional category name to filter
-     * @returns {Object} a new aggregate promise
-     * @for Scout
-     */
-    $.fn.promise = function(category) {
-        var defers = [],
-            useCategory = typeof category === "string",
-            count = 0,
-            master = new $.Deferred(),
-            $c = this;
-        this.each(function(e) {
-            var dd = $.data(e, "_defer");
-            if(!dd) return;
-            for(var i in dd) {
-                if(useCategory && category !== i) continue;
-                for(var j in dd[i]) {
-                    var defer = dd[i][j];
-                    if(defers.indexOf(defer) < 0) {
-                        count++;
-                        defers.push(defer);
-                        defer.promise().done(function() {
-                            if(!--count) master.resolveWith($c, $c);
-                        });
-                    }
-                }
-            }
-        });
-        return master.promise();
-    }
-    $.register();
-})(Scout);
-//     events.js
-//     (c) 2013 Chris Colinsky https://github.com/dev-scouts-of-america/scout.js
+//     event.js
+//     (c) 2015 Chris Colinsky https://github.com/pmko/scout.js
 //     Licensed under the terms of the MIT license.
 
 (function($) {
@@ -1743,500 +1350,3 @@
 
     $.register();
 })(Scout);
-//     animation.js
-//     (c) 2013 Chris Colinsky https://github.com/dev-scouts-of-america/scout.js
-//     Licensed under the terms of the MIT license.
-
-(function($) {
-    var transitionEnd = "transitionend",
-        style = $.vendorStyle("transition");
-
-    switch(style) {
-        case "-webkit-transition":
-            transitionEnd = "webkitTransitionEnd";
-            break;
-        case "-ms-transition":
-            transitionEnd = "MSTransitionEnd";
-            break;
-    }
-
-    $.fn.animate = function(properties, duration, options) {
-        var defaultOptions = {
-            ease: 'ease-out',
-            delay: 0,
-            complete: function() {}
-        },
-        clear = {};
-
-        clear['transition-property'] = '';
-        clear['transition-duration'] = '';
-        clear['transition-timing-function'] = '';
-        clear['transition-delay'] = '';
-        clear['animation-name'] = '';
-        clear['animation-duration'] = '';
-
-        duration = duration || 0.3;
-        options = options || defaultOptions;
-        options = $.automap(defaultOptions, options);
-
-        var _d = "_defer";
-        var defer = new $.Deferred();
-        this.each(function(val) {
-            var dd = $.data(val, _d) || $.data(val, _d, {});
-            dd = (dd["fx"] = dd["fx"] || []);
-            dd.push(defer);
-        });
-
-        $.defer(this, exec);
-        function exec() {
-            var count = this.length;
-            var c = this;
-            this.each(function(val, index, array) {
-				var timeout;
-				eventHandler = function(evt) {
-					clearTimeout(timeout);
-					if (evt) evt.stopPropagation();
-                    this.removeEventListener(transitionEnd, eventHandler, false);
-                    $(val).css(clear);
-                    var dd = $.data(val, _d)["fx"];
-                    dd.splice(dd.indexOf(defer), 1);
-                    if(--count == 0) {
-                        defer.resolve(c);
-                        options.complete.call(val);
-                    }
-                };
-                val.addEventListener(transitionEnd, eventHandler, false);
-
-                var transOptions = ' ' + duration + 's ' + options.ease + ' ' + options.delay + 's',
-                    newProps = [],
-                    eventHandler;
-                newProps['transition'] = 'all' + transOptions;
-                for(var prop in properties) newProps[prop] = properties[prop];
-                $(val).css(newProps);
-
-				timeout = setTimeout(eventHandler,(duration+options.delay+0.2)*1000);
-            });
-        }
-        return defer;
-    }
-})(Scout);
-(function($, doc, window){
-    var settings = {
-        tapThreshold: 25,
-        dragThreshold: 5,
-        swipeThreshold: 50,
-        swipeTolerance: 0.85,
-        scaleThreshold: 0.05,
-        rotateThreshold: 5,
-        holdTimeout: 1
-    };
-    var driverName = null;
-    $.touch = {
-        /**
-         * Set configuration values related to touch support. Available settings are:
-         *
-         * tapThreshold - The maximum distance a pointer may move and be considered
-         *                a tap.
-         * dragThreshold - The distance moved before drag events are triggered.
-         * swipeThreshold - The distance moved before a swipe event is triggered.
-         * swipeTolerance - The minimum dot product between a normalized swipe vector
-         *                   and a basis vector to trigger a swipe (higher is less
-         *                   tolerant of diagonal swipes; 1 would require a perfect line).
-         * scaleThreshold - The minimum delta in % before scale events are triggered.
-         * rotateThreshold - The minimum delta in degrees before rotate events are triggered.
-         *
-         * @param {Object} opts an object containing touch settings
-         * @method $.touch.config
-         * @for Scout
-         */
-        config: function(opts) {
-            $.extend(settings, opts);
-        },
-        registerDriver: function(name, callback) {
-            if(!driverName && callback($, settings, doc, window)) {
-                driverName = name;
-            }
-        },
-        driver: function() {
-            return driverName;
-        },
-        isMultiTouch: function() {
-            switch(this.driver()) {
-                case "mouse":
-                    return false;
-                case "msft":
-                    return window.navigator.msMaxTouchPoints >= 2;
-                default:
-                    return true;
-            };
-        }
-    };
-    function cancel(e) {
-        if(e && typeof e.preventDefault === "function") e.preventDefault();
-    }
-    /**
-     * Disable the native touch scrolling and navigating behavior on
-     * the elements. This is often needed when apps want to capture
-     * gestures.
-     *
-     * @method .disableTouchScroll
-     * @for Scout
-     */
-    $.fn.disableTouchScroll = function() {
-        this.each(function(el) {
-            el.addEventListener("touchmove", cancel);
-        });
-        this.css("-ms-touch-action", "none");
-    }
-    /**
-     * Re-enable native touch behaviors after a call to .disableTouchScroll()
-     *
-     * @method .enableTouchScroll
-     * @for Scout
-     */
-    $.fn.enableTouchScroll = function() {
-        this.each(function(el) {
-            el.removeEventListener("touchmove", cancel);
-        });
-        $el.css("-ms-touch-action", "auto");
-    }
-    $.register();
-})(Scout, document, window);
-$.touch.registerDriver("msft", function($, opts, doc, window) {
-    if(!("onmspointerdown" in doc) || !("MSGesture" in window)) return false;
-    var state = null,
-        gesture = null,
-        gestureEvents = ["MSGestureTap","MSGestureHold","MSGestureStart","MSGestureChange"],
-        gcount = 0;
-    function extract(e, start) {
-        var result = {
-            target: e.target, screenX: e.screenX, screenY: e.screenY,
-            clientX: e.clientX, clientY: e.clientY, distance: 0, id: e.pointerId,
-            deltaX: 0, deltaY: 0, distanceSquared: 0,
-            distance: function() { return Math.sqrt(this.distanceSquared); },
-            originalEvent: e
-        };
-        if(start) {
-            result.deltaX = result.clientX - start.clientX;
-            result.deltaY = result.clientY - start.clientY;
-            result.distanceSquared = result.deltaX * result.deltaX + result.deltaY * result.deltaY;
-        }
-        return result;
-    }
-    var radToDeg = 180 / Math.PI;
-    function gextract(e, cur) {
-        var dx = e.translationX,
-            dy = e.translationY;
-        cur.deltaX += dx;
-        cur.deltaY += dy;
-        cur.screenX += dx;
-        cur.screenY += dy;
-        cur.clientX += dx;
-        cur.clientY += dy;
-        cur.distanceSquared = cur.deltaX * cur.deltaX + cur.deltaY * cur.deltaY;
-        cur.scale *= e.scale;
-        cur.rotation += e.rotation * radToDeg;
-        return cur;
-    }
-    function onGesture(e) {
-        if(!state) return;
-        state.gesture && (state.gesture = gextract(e, state.gesture));
-        var g = state.gesture;
-        var $el = $(state.start.target);
-        switch(e.type) {
-            case "MSGestureStart":
-                g = state.gesture = {scale: 1, rotation: 0};
-                $.extend(g, state.current);
-                break;
-            case "MSGestureTap":
-                $el.trigger("tap", state.start);
-                endGesture();
-                break;
-            case "MSGestureHold":
-                $el.trigger("hold", state.start);
-                endGesture();
-                break;
-            case "MSGestureChange":
-                var dx = g.deltaX,
-                    dy = g.deltaY,
-                    st = opts.swipeThreshold;
-                if(!state.isScaling && !state.isRotating && !state.swipe && gcount == 1
-                        && (Math.abs(dx) >= st || Math.abs(dy) >= st)) {
-                    var mag = g.distance();
-                    dx /= mag;
-                    dy /= mag;
-                    var t = opts.swipeTolerance;
-                    if(dx >= t) state.swipe = "right";
-                    else if (dx <= -t) state.swipe = "left";
-                    else if (dy >= t) state.swipe = "down";
-                    else if (dy <= -t) state.swipe = "up";
-                    if(state.swipe) {
-                        g.direction = state.swipe;
-                        $el.trigger("swipe", g);
-                        endGesture();
-                    }
-                }
-                if(state.isRotating || Math.abs(g.rotation) >= opts.rotateThreshold) {
-                    $el.trigger(state.isRotating ? "rotate" : "rotatestart", g);
-                    state.isRotating = true;
-                }
-                if(state.isScaling || Math.abs(g.scale - 1) >= opts.scaleThreshold) {
-                    $el.trigger(state.isScaling ? "scale" : "scalestart", g);
-                    state.isScaling = true;
-                }
-                break;
-        }
-    }
-    function endGesture() {
-        if(gesture) {
-            gesture.stop();
-            for(var i in gestureEvents) {
-                doc.removeEventListener(gestureEvents[i], onGesture);
-                gesture.target.removeEventListener(gestureEvents[i], onGesture);
-            }
-            gesture = null;
-            gcount = 0;
-        }
-    }
-    doc.addEventListener("MSPointerDown", function(e) {
-        state = { start: extract(e) };
-        state.current = state.start;
-        $(e.target).trigger("pointerdown", state.start);
-        if(!gesture) {
-            gesture = new MSGesture();
-            // gestures must be tracked at the body level so that transformed
-            // elements don't mess up pointer tracking
-            gesture.target = doc.body;
-            for(var i in gestureEvents) {
-                gesture.target.addEventListener(gestureEvents[i], onGesture);
-            }
-        }
-        gcount++;
-        gesture.addPointer(e.pointerId);
-    });
-    doc.addEventListener("MSPointerMove", function(e) {
-        if(!state || e.pointerId != state.start.id) return;
-        state.current = extract(e, state.start);
-        var $el = $(state.start.target);
-        $el.trigger("pointermove", state.current);
-        if(state.isDragging || state.current.distanceSquared > opts.dragThreshold * opts.dragThreshold) {
-            state.isDragging = true;
-            $el.trigger(state.isDragging ? "drag" : "dragstart", state.current);
-            var dx = state.current.deltaX,
-                dy = state.current.deltaY;
-            var st = opts.swipeThreshold;
-        }
-    });
-    doc.addEventListener("MSPointerUp", function(e) {
-        if(!state) return;
-        state.current = extract(e, state.start);
-        var $el = $(state.start.target);
-        if(state.isDragging) $el.trigger("dragend", state.current);
-        if(state.isRotating) $el.trigger("rotateend", state.current);
-        if(state.isScaling) $el.trigger("scaleend", state.current);
-        $el.trigger("pointerup", state.current);
-        endGesture();
-        state = null;
-    });
-    return true;
-});
-$.touch.registerDriver("apple", function($, opts, doc) {
-    if(!("ontouchstart" in doc)) return false;
-    var state = null;
-    function extract(e, start) {
-        if(start) {
-            for(var i = 0; i < e.changedTouches.length; i++) {
-                if(e.changedTouches[i].identifier == start.id) {
-                    t = e.changedTouches[i];
-                    break;
-                }
-            }
-        }
-        else t = e.changedTouches[0];
-
-        if(!t) return;
-
-        var result = {
-            target: t.target, screenX: t.screenX, screenY: t.screenY,
-            clientX: t.clientX, clientY: t.clientY, distance: 0, id: t.identifier,
-            distance: function() { return Math.sqrt(this.distanceSquared); },
-            originalEvent: e
-        };
-        if(start) {
-            result.deltaX = result.clientX - start.clientX;
-            result.deltaY = result.clientY - start.clientY;
-            result.distanceSquared = result.deltaX * result.deltaX + result.deltaY * result.deltaY;
-        }
-        return result;
-    }
-    var holdTimer = null;
-    function onHold() {
-        if(!state) return;
-        $(state.start.target).trigger("hold", state.current);
-        holdTimer = null;
-        state.isHold = true;
-    }
-    doc.addEventListener("touchstart", function(e) {
-        var start = extract(e);
-        if(start && e.touches.length == 1) {
-            state = { start: extract(e) };
-            state.current = state.start;
-            $(e.target).trigger("pointerdown", state.start);
-            holdTimer = window.setTimeout(onHold, opts.holdTimeout * 1000);
-        }
-    });
-    doc.addEventListener("touchmove", function(e) {
-        if(!state || !(state.current = extract(e, state.start))) return;
-        if(e.touches.length != 1) {
-            state = null;
-            return;
-        }
-        var $el = $(state.start.target);
-        $el.trigger("pointermove", state.current);
-        if(state.current.distanceSquared >= opts.tapThreshold * opts.tapThreshold) {
-            window.clearTimeout(holdTimer);
-            holdTimer = null;
-        }
-        if(state.isDragging || state.current.distanceSquared >= opts.dragThreshold * opts.dragThreshold) {
-            $el.trigger(state.isDragging ? "drag" : "dragstart", state.current);
-            state.isDragging = true;
-            var dx = state.current.deltaX,
-                dy = state.current.deltaY;
-            var st = opts.swipeThreshold;
-            if(!state.swipe && (Math.abs(dx) >= st || Math.abs(dy) >= st)) {
-                var mag = state.current.distance();
-                dx /= mag;
-                dy /= mag;
-                var t = opts.swipeTolerance;
-                if(dx >= t) state.swipe = "right";
-                else if (dx <= -t) state.swipe = "left";
-                else if (dy >= t) state.swipe = "down";
-                else if (dy <= -t) state.swipe = "up";
-                if(state.swipe) {
-                    state.current.direction = state.swipe;
-                    $el.trigger("swipe", state.current);
-                }
-            }
-        }
-    });
-    doc.addEventListener("touchend", function(e) {
-        if(!state || !(state.current = extract(e, state.start))) return;
-        var $el = $(state.start.target);
-        if(state.isDragging) $el.trigger("dragend", state.current);
-        $el.trigger("pointerup", state.current);
-        if(e.touches.length == 0 && state.current.distanceSquared <= opts.tapThreshold * opts.tapThreshold
-            && !state.swipe && !state.isHold) {
-            $el.trigger("tap", state.current);
-        }
-        window.clearTimeout(holdTimer);
-        holdTimer = null;
-        state = null;
-    });
-
-    var gstate = null;
-    function gextract(e) {
-        return { target: e.target, scale: e.scale, rotation: e.rotation };
-    }
-    doc.addEventListener("gesturestart", function(e) {
-        gstate = { start: gextract(e) };
-    });
-    doc.addEventListener("gesturechange", function(e) {
-        if(!gstate) return;
-        gstate.current = gextract(e, gstate.start);
-        var $el = $(e.target);
-        if(gstate.isScaling || Math.abs(gstate.current.scale - 1) >= opts.scaleThreshold) {
-            $el.trigger(gstate.isScaling ? "scale" : "scalestart" , gstate.current);
-            gstate.isScaling = true;
-        }
-        if(gstate.isRotating || Math.abs(gstate.current.rotation) >= opts.rotateThreshold) {
-            $el.trigger(gstate.isRotating ? "rotate" : "rotatestart", gstate.current);
-            gstate.isRotating = true;
-        }
-    });
-    doc.addEventListener("gestureend", function(e) {
-        gstate.current = gextract(e, gstate.start);
-        var $el = $(e.target);
-        if(gstate.isScaling) $el.trigger("scaleend", gstate.current);
-        if(gstate.isRotating) $el.trigger("rotateend", gstate.current);
-        gstate = null;
-    });
-    return true;
-});
-$.touch.registerDriver("mouse", function($, opts, doc) {
-    if(!("onmousedown" in doc)) return false;
-    var state = null;
-    function extract(e, start) {
-        var result = {
-            target: e.target, screenX: e.screenX, screenY: e.screenY,
-            clientX: e.clientX, clientY: e.clientY, distanceSquared: 0,
-            distance: function() { return Math.sqrt(this.distanceSquared); },
-            originalEvent: e
-        };
-        if(start) {
-            result.deltaX = result.clientX - start.clientX;
-            result.deltaY = result.clientY - start.clientY;
-            result.distanceSquared = result.deltaX * result.deltaX + result.deltaY * result.deltaY;
-        }
-        return result;
-    }
-    var holdTimer = null;
-    function onHold() {
-        if(!state) return;
-        $(state.start.target).trigger("hold", state.current);
-        window.clearTimeout(holdTimer);
-        holdTimer = null;
-        state.isHold = true;
-    }
-    doc.addEventListener("mousedown", function(e) {
-        state = { start: extract(e) };
-        state.current = state.start;
-        $(e.target).trigger("pointerdown", state.start);
-        holdTimer = window.setTimeout(onHold, opts.holdTimeout * 1000);
-    });
-    doc.addEventListener("mousemove", function(e) {
-        if(!state) return;
-        state.current = extract(e, state.start);
-        var $el = $(state.start.target);
-        $el.trigger("pointermove", state.current);
-        if(holdTimer && state.current.distanceSquared >= opts.tapThreshold * opts.tapThreshold) {
-            window.clearTimeout(holdTimer);
-            holdTimer = null;
-        }
-        if(state.isDragging || state.current.distanceSquared > opts.dragThreshold * opts.dragThreshold) {
-            $el.trigger(state.isDragging ? "drag" : "dragstart", state.current);
-            state.isDragging = true;
-            var dx = state.current.deltaX,
-                dy = state.current.deltaY;
-            var st = opts.swipeThreshold;
-            if(!state.swipe && (Math.abs(dx) >= st || Math.abs(dy) >= st)) {
-                var mag = state.current.distance();
-                dx /= mag;
-                dy /= mag;
-                var t = opts.swipeTolerance;
-                if(dx >= t) state.swipe = "right";
-                else if (dx <= -t) state.swipe = "left";
-                else if (dy >= t) state.swipe = "down";
-                else if (dy <= -t) state.swipe = "up";
-                if(state.swipe) {
-                    state.current.direction = state.swipe;
-                    $el.trigger("swipe", state.current);
-                }
-            }
-        }
-    });
-    doc.addEventListener("mouseup", function(e) {
-        if(!state) return;
-        state.current = extract(e, state.start);
-        var $el = $(state.start.target);
-        if(state.isDragging) $el.trigger("dragend", state.current);
-        $el.trigger("pointerup", state.current);
-        if(state.start.target === e.target && !state.swipe && !state.isHold)
-            $el.trigger("tap", state.current);
-        if(holdTimer) {
-            window.clearTimeout(holdTimer);
-            holdTimer = null;
-        }
-        state = null;
-    });
-    return true;
-});

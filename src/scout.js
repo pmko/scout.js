@@ -5,15 +5,15 @@
 (function(exports) {
     var scout = function() {
         var a = [],
-            b = 'boolean',
-            d = document,
-            f = 'function',
-            n = 'number',
-            o = 'object',
-            s = 'string',
-            u = 'undefined',
-            w = window,
-            i = 0;
+          b = "boolean",
+          d = document,
+          f = "function",
+          n = "number",
+          o = "object",
+          s = "string",
+          u = "undefined",
+          w = window,
+          i = 0;
 
         /**
          * Core Scout object. Attempts to subclass Array.
@@ -88,21 +88,20 @@
             return S(elements);
         }
 
-        $.VERSION = '0.9.0';
+        $.VERSION = "1.0.0";
 
         function selectorEngine(element, selector) {
             var result;
             //engine is optimized by highest performing queries first
             //represents the perferred priority of section types
-            if (/^\.([\w-]+)$/.test(selector)) {
-                //select by single class identifier
+            if (/^\.([\w\-]+)$/.test(selector)) { //select by single class identifier
                 result = element.getElementsByClassName(RegExp.$1);
-            } else if (/^#([\w-]+)$/.test(selector)) {//select by ID
+            } else if (/^#([\w\-]+)$/.test(selector)) { //select by ID
                 result = d.getElementById(RegExp.$1);
                 return result ? [result] : [];
-            } else if (/^[\w]+$/.test(selector)) {//select by tag name
+            } else if (/^[\w]+$/.test(selector)) { //select by tag name
                 result = element.getElementsByTagName(selector);
-            } else {//just try to find somehting, usually a nested query.
+            } else { //just try to find somehting, usually a nested query.
                 result = element.querySelectorAll(selector);
             }
 
@@ -118,8 +117,8 @@
 
         //turn strings into html
         function createFragment(html) {
-            var fragment = d.createElement('div');
-            fragment.insertAdjacentHTML('beforeend', html);
+            var fragment = d.createElement("div");
+            fragment.insertAdjacentHTML("beforeend", html);
             return a.slice.call(toArray(fragment.childNodes), 0);
         }
 
@@ -272,9 +271,9 @@
         //safe logging
         $.log = function(msg, force) {
             force = force || false;
-            if (typeof console === 'undefined' || force) { //for IE when debugger is closed
-                $('p.log-output').append(msg + '<br/>');
-            } else if (typeof console.log === 'function') {
+            if (typeof console === "undefined" || force) { //for IE when debugger is closed
+                $("p.log-output").append(msg + "<br/>");
+            } else if (typeof console.log === "function") {
                 console.log.call(console, msg);
             } else { //for IE when debugger is open
                 Function.prototype.bind.call(console.log, console).call(console, msg);
@@ -283,11 +282,11 @@
 
         $.defer = (function() {
             var deferred = [],
-                msgId = 'defer-msg';
+                msgId = "defer-msg";
 
             function defer(context, fn, args) {
                 deferred.push({ctx: context, f: fn, a: args});
-                window.postMessage(msgId, '*');
+                window.postMessage(msgId, "*");
             }
 
             function deferHandler(evt) {
@@ -301,7 +300,7 @@
                 }
             }
 
-            window.addEventListener('message', deferHandler, true);
+            window.addEventListener("message", deferHandler, true);
             return defer;
         })();
 
@@ -344,9 +343,9 @@
              * @param {Function} callback The callback to be executed.
              */
             ready: function(callback) {
-                var rs = 'readyState',
-                    rsc = 'readystatechange',
-                    dcl = 'DOMContentLoaded';
+                var rs = "readyState",
+                    rsc = "readystatechange",
+                    dcl = "DOMContentLoaded";
 
                 function loaded() {
                     return /complete|loaded/.test(d[rs]);
@@ -474,11 +473,11 @@
              */
             join: function(separator, attr) {
                 if (typeof attr === u) {
-                    return a.join.call(this, separator || ',');
+                    return a.join.call(this, separator || ",");
                 } else {
-                    var str = '';
+                    var str = "";
                     this.forEach(function(val, index, array) {
-                        str += $(val).attr(attr) + (separator || ',');
+                        str += $(val).attr(attr) + (separator || ",");
                     });
                     return str.substr(0, str.length - 1);
                 }
@@ -587,7 +586,7 @@
                     var val = this[0].getAttribute(name);
                     if (val == null) return undefined;
 
-                    if (val.charAt(0) == '{' || val.charAt(0) == '[') {
+                    if (val.charAt(0) == "{" || val.charAt(0) == "[") {
                         try {
                             val = JSON.parse(val);
                         } catch (e) {
@@ -614,7 +613,7 @@
              * @param {String} name The name of the attribute to remove.
              */
             removeAttr: function(name) {
-                if (typeof name === 'string') {
+                if (typeof name === "string") {
                     this.each(function(val){
                         val.removeAttribute(name);
                     });
@@ -914,21 +913,21 @@
                     if (this.length == 0) return undefined;
                     return w.getComputedStyle(this[0], null).getPropertyValue($.vendorStyle(property));
                 } else {
-                    var styleDef = '';
+                    var styleDef = "";
                     if (typeof property === s) {
                         var p = $.vendorStyle(property);
-                        if(value === '') {
+                        if(value === "") {
                             this.each.call(this, function(val) { val.style.removeProperty(p); });
                         } else {
-                            styleDef = p + ':' + topx(property, value) + ';';
+                            styleDef = p + ":" + topx(property, value) + ";";
                         }
                     } else {
                         for (var prop in property) {
                             var p = $.vendorStyle(prop);
-                            if (property[prop] === '') {
+                            if (property[prop] === "") {
                                 this.each.call(this, function(val, index, array) { val.style.removeProperty(p); });
                             } else {
-                                styleDef += p + ':' + topx(prop, property[prop]) + ';';
+                                styleDef += p + ":" + topx(prop, property[prop]) + ";";
                             }
                         }
                     }
@@ -946,7 +945,7 @@
              * @param {String} className The name of the CSS class to check for.
              */
             hasClass: function(className) {
-                if ('classList' in d.documentElement) {
+                if ("classList" in d.documentElement) {
                     return this[0].classList.contains(className);
                 } else {
                     var cl = this[0].className,
@@ -962,12 +961,12 @@
              */
             addClass: function(className) {
                 this.each.call(this, function(val, index, array) {
-                    if ('classList' in d.documentElement) {
+                    if ("classList" in d.documentElement) {
                         val.classList.add(className);
                     } else {
                         if (!$(val).hasClass(className)) {
                             var cl = val.className;
-                            val.className = cl + ' ' + className;
+                            val.className = cl + " " + className;
                         }
                     }
                 });
@@ -980,7 +979,7 @@
              */
             removeClass: function(className) {
                 this.each.call(this, function(val, index, array) {
-                    if ('classList' in d.documentElement) {
+                    if ("classList" in d.documentElement) {
                         val.classList.remove(className);
                     } else {
                         if ($(val).hasClass(className)) {
@@ -988,7 +987,7 @@
                                 index = cl.indexOf(className),
                                 newVal;
                             cl.splice(index, 1);
-                            newVal = cl.join(' ');
+                            newVal = cl.join(" ");
                             val.className = newVal;
                         }
                     }
@@ -1003,7 +1002,7 @@
              */
             toggleClass: function(className) {
                 this.each.call(this, function(val, index, array) {
-                    if ('classList' in d.documentElement) {
+                    if ("classList" in d.documentElement) {
                         val.classList.toggle(className);
                     } else {
                         if ($(val).hasClass(className)) {
@@ -1061,6 +1060,6 @@
 
     var s = scout();
     exports.S = exports.Scout = s;
-    '$' in exports || (exports.$ = s);
+    "$" in exports || (exports.$ = s);
 
 })(window);

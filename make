@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 require('shelljs/make');
-fs = require('fs');
+strip = require('strip-comments');
 uglify = require('uglify-js');
 
 scout_js  = 'dist/scout.js';
@@ -18,15 +18,18 @@ target.build = function() {
 	module_files = [];
   for (var file of modules) { module_files.push(`src/${file}.js`); }
   dist = cat(module_files);
-	(dist).to(scout_js);
+	clean = strip(dist);
+	(clean).to(scout_js);
 };
 
 target.minify = function() {
-  min = minify(scout_js);
-	(min.code).to(scout_min);
-	//(min.map).to(scout_map);
+  result = minify(scout_js);
+	(result.code).to(scout_min);
 };
 
 minify = function(source) {
-	return uglify.minify(source);
+	options = {
+		warnings: true
+	}
+	return uglify.minify(source,options);
 };

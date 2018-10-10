@@ -9,9 +9,9 @@
                 defaultOptions = {
                     url: null,
                     context: xhr,
-                    method: 'GET',
+                    method: "GET",
                     headers: {},
-                    responseType: 'json',
+                    responseType: "json",
                     data: null,
                     timeout: 0,
                     progress: function() {},
@@ -23,20 +23,20 @@
                 xhrTimeout,
                 p;
 
-            if (typeof url === 'string') {
+            if (typeof url === "string") {
                 defaultOptions.url = url;
-            } else if (typeof url === 'object') {
+            } else if (typeof url === "object") {
                 options = url;
             }
 
-            defaultOptions.headers['Accept'] = '*/*';
-            defaultOptions.headers['Content-Type'] = 'application/x-www-form-urlencoded';
-            defaultOptions.headers['X-Requested-With'] = 'XMLHttpRequest';
+            defaultOptions.headers["Accept"] = "*/*";
+            defaultOptions.headers["Content-Type"] = "application/x-www-form-urlencoded";
+            defaultOptions.headers["X-Requested-With"] = "XMLHttpRequest";
 
             options = options || defaultOptions;
             options = $.automap(defaultOptions, options);
 
-            if (options.url === null) throw new Error('no url was provided for ajax call');
+            if (options.url === null) throw new Error("no url was provided for ajax call");
 
             //check for CORS request
             if (options.url.indexOf(window.location.hostname) > -1) isCORS = true;
@@ -44,7 +44,7 @@
             var deferred = new $.Deferred();
 
             //https://hacks.mozilla.org/2009/07/cross-site-xmlhttprequest-with-cors/
-            if (!('withCredentials' in xhr) && window.XDomainRequest && isCORS) {
+            if (!("withCredentials" in xhr) && window.XDomainRequest && isCORS) {
                 xhr = new XDomainRequest();
                 if (xhr) {
                     xhr.onload = function() {
@@ -53,13 +53,13 @@
                     };
                     xhr.onerror = function() {
                         deferred.reject(xhr, xhr.statusText);
-                        options.error.call(options.context, '', new Error('unable to make xhr request.'));
+                        options.error.call(options.context, "", new Error("unable to make xhr request."));
                     };
                     xhr.onprogress = options.progress;
                     xhr.timeout = options.timeout;
                     xhr.open(options.method, url);
                 } else {
-                    options.error.call(options.context, '', new Error('unable to make xhr request.'));
+                    options.error.call(options.context, "", new Error("unable to make xhr request."));
                 }
             } else {
                 xhr.onreadystatechange = function() {
@@ -67,7 +67,7 @@
 
                     if (xhr.status >= 200 && xhr.status < 300 || xhr.status == 304) {
                         deferred.resolve(xhr.responseText, xhr.statusText, xhr);
-                        options.complete.call(options.context, xhr.responseText, xhr.getResponseHeader('Content-Type'));
+                        options.complete.call(options.context, xhr.responseText, xhr.getResponseHeader("Content-Type"));
                     } else if (xhr.status == 404 || xhr.status == 500) {
                         deferred.reject(xhr, xhr.statusText);
                         options.complete.call(options.context, xhr.responseText, new Error(xhr.status));
@@ -79,7 +79,7 @@
                 xhr.open(options.method, options.url, true);
                 xhr.timeout = options.timeout;
 
-                if (options.method == 'POST') {
+                if (options.method == "POST") {
                     var headers = options.headers;
                     for (p in headers) {
                         xhr.setRequestHeader(p, headers[p]);
@@ -87,7 +87,7 @@
                 }
             }
             //TODO - automatically handle data when request is a GET
-            xhr.send(options.method == 'POST' ? options.data : null);
+            xhr.send(options.method == "POST" ? options.data : null);
 
             if (options.timeout > 0) {
                 xhrTimeout = setTimeout(timeoutHandler, options.timeout);

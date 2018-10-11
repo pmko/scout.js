@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 require('shelljs/make');
-const strip = require('strip-comments');
+//const strip = require('strip-comments');
 const ClosureCompiler = require('google-closure-compiler').jsCompiler;
 
 const scout_js  = 'dist/scout.js';
@@ -18,12 +18,9 @@ target.build = function() {
   module_files = [];
   for (var file of modules) { module_files.push(`src/${file}.js`); }
   dist = cat(module_files);
-  clean = strip(dist);
-  (clean).to(scout_js);
-  comp = minify(clean);
-
-	//Need to append sourmap comment
-
+  (dist).to(scout_js);
+  comp = minify(dist);
+	comp.src = comp.src + "\n//# sourceMappingURL=scout.min.js.map";
 	(comp.src).to(scout_min);
 	(comp.sourceMap).to(scout_map);
 };
@@ -40,14 +37,27 @@ minify = function(source) {
     sourceMap: null
     }], (exitCode, stdOut, stdErr) => {
 			if (!exitCode) {
-			  echo("success: writing to file");
-				//echo(stdOut[0]);
+			  echo("[" + getDate() +"] success: writing to file");
 				result = stdOut[0];
 		  } else {
-				echo("exit code: "+exitCode);
+				echo("[" + getDate() +"] exit code: "+exitCode);
 				echo(stdErr)
+				process.exit(1);
 		  }
   });
 
 	return result;
+};
+
+getDate = function() {
+  var currentDate = new Date();
+	var date = currentDate.getDate();
+	var month = currentDate.getMonth();
+	var year = currentDate.getFullYear();
+
+	return pad(month + 1) + "/" + pad(date) + "/" + year;
+};
+
+pad = function(n) {
+	 return n<10 ? '0'+n : n;
 };

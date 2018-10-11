@@ -6,7 +6,7 @@ const ClosureCompiler = require('google-closure-compiler').jsCompiler;
 
 const scout_js  = 'dist/scout.js';
 const scout_min = 'dist/scout.min.js';
-const scout_map = 'dist/scout.min.js.map;'
+const scout_map = 'dist/scout.min.js.map'
 var comp = {};
 
 target.dist = function() {
@@ -35,7 +35,7 @@ minify = function(source) {
   });
 
   const compilerProcess = closureCompiler.run([{
-    path: scout_js,
+    path: 'scout.js',
     src: source,
     sourceMap: null
     }], (exitCode, stdOut, stdErr) => {

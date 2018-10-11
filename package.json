@@ -1,0 +1,29 @@
+{
+  "name": "scout",
+  "version": "1.0.0",
+  "description": "micro js lib",
+  "main": "scout.js",
+  "dependencies": {
+    "google-closure-compiler": "^20180910.1.0",
+    "shelljs": "^0.1.4",
+    "strip-comments": "^1.0.2",
+    "uglify-js": "^2.8.29"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pmko/scout.js.git"
+  },
+  "keywords": [
+    "javascript"
+  ],
+  "author": "chris colinsky",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pmko/scout.js/issues"
+  },
+  "homepage": "https://github.com/pmko/scout.js#readme"
+}

@@ -112,7 +112,7 @@
         }
 
         
-        $.extend = function(deep, dest, src, rm) {
+        $.extend = function extendObj(deep, dest, src, rm) {
             if(deep !== true) {
                 rm = src;
                 src = dest;
@@ -126,7 +126,8 @@
             for (var prop in src) {
                 if (deep && typeof src[prop] === o && src[prop] !== null) {
                     dest[prop] = dest[prop] || {};
-                    arguments.callee(dest[prop], src[prop]);
+                    
+                    extendObj(dest[prop], src[prop]);
                 } else {
                     dest[prop] = src[prop];
                 }

@@ -25,7 +25,6 @@
      * @param {Object} [opts] the value or reference to be stored
      * @return {Object} returns this
      * @method .trigger
-     * @for Scout
      */
     $.fn.trigger = function(type, args, opts) {
         this.each(function(el) {
@@ -40,7 +39,6 @@
      * @param {Function} [callback] the event handler
      * @return {Object} returns this
      * @method .bind
-     * @for Scout
      */
     $.fn.bind = function(type, callback) {
         this.each(function(el) {
@@ -55,7 +53,6 @@
      * @param {Function} [callback] the previously-added event handler
      * @return {Object} returns this
      * @method .unbind
-     * @for Scout
      */
     $.fn.unbind = function(type, callback) {
         this.each(function(el) {
@@ -71,7 +68,6 @@
      * @param {Function} [callback] the event handler
      * @return {Object} returns this
      * @method .on
-     * @for Scout
      */
     $.fn.on = function(type, selector, callback) {
         if(typeof selector === "string") {
@@ -90,7 +86,6 @@
      * @param {Function} [callback] the event handler
      * @return {Object} returns this
      * @method .on
-     * @for Scout
      */
     $.fn.one = function(type, selector, callback) {
         var c = this;
@@ -114,7 +109,6 @@
      * @param {Function} [callback] the previously-added event handler
      * @return {Object} returns this
      * @method .off
-     * @for Scout
      */
     $.fn.off = function(type, selector, callback) {
         if(typeof selector === "string") {
@@ -136,7 +130,6 @@
      * @param {Function} [callback] the event handler
      * @return {Object} returns this
      * @method .delegate
-     * @for Scout
      */
     $.fn.delegate = function(selector, type, callback) {
         var $c = this;
@@ -161,7 +154,6 @@
      * @param {Function} [callback] the previously-added event handler
      * @return {Object} returns this
      * @method .delegate
-     * @for Scout
      */
     $.fn.undelegate = function(selector, type, callback) {
         this.each(function(el) {

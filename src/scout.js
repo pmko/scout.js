@@ -195,7 +195,6 @@
          * @param {Object} [value] the value or reference to be stored
          * @return {Object} the stored value or undefined if no such key exists
          * @method $.data
-         * @for Scout
          */
         $.data = function(el, key, value) {
             var d = getData(el);
@@ -223,7 +222,6 @@
          * @param {Object} [el] the element
          * @param {String} [key*] the data key
          * @method $.removeData
-         * @for Scout
          */
         $.removeData = function(el, key) {
             var d = getData(el);
@@ -243,7 +241,6 @@
          * @param {Object} val the value to search for
          * @param {Array} arr the array to search
          * @method $.inArray
-         * @for Scout
          */
         $.inArray = function(val, arr) {
             return arr.indexOf(val);
@@ -416,7 +413,6 @@
              * @param {Object} [value] the value or reference to be stored
              * @return {Object} the stored data value or undefined if there is no such key
              * @method .data
-             * @for Scout
              */
             data: function(key, value) {
                 if(typeof key === o) {
@@ -439,7 +435,6 @@
              * @param {String} [key*] the data key
              * @return {Object} returns this
              * @method .removeData
-             * @for Scout
              */
             removeData: function() {
                 var args = arguments[0] instanceof Array ? arguments[0] : arguments;
@@ -708,8 +703,7 @@
                 }
                 return this;
             },
-            appendTo: function(target) {
-				//TODO: - should support any argument type that the $() accepts
+            appendTo: function(target) { //TODO: - should support any argument type that the $() accepts
                 this.each.call(this, function(val, index, array) {
                     $(target).append(val);
                 });
@@ -738,8 +732,7 @@
                 }
                 return this;
             },
-            prependTo: function(target) {
-				//TODO: - should support any argument type that the $() accepts
+            prependTo: function(target) { //TODO: - should support any argument type that the $() accepts
                 this.each.call(this, function(val, index, array) {
                     $(target).prepend(val);
                 });
@@ -796,8 +789,8 @@
              */
             empty: function() {
                 this.each.call(this, function(val, index, array) {
-					while(val.hasChildNodes())
-                    	val.removeChild(val.childNodes[0]);
+                  while(val.hasChildNodes())
+                    val.removeChild(val.childNodes[0]);
                 });
                 return this;
             },
@@ -806,6 +799,7 @@
              *
              * @method $.index
              * @param {String} elem The selector of an element to get the index of.
+             */
             index: function(elem) {
                 return (typeof elem === u) ?
                     this.parent().children().indexOf(this[0]) :
